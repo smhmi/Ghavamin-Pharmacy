@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داروخانه فوق تخصصی شبانه روزی قوامین</title>
+    <title>داروخانه شبانه روزی قوامین</title>
     <style>
         body {
             font-family: tahoma, sans-serif;
@@ -102,11 +102,107 @@
             font-size: 14px;
             color: #666;
         }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 400px;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            background: #0078ff;
+            color: #fff;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .btn:hover {
+            background: #005fcc;
+        }
+        /* پاپ‌آپ (Modal) */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: right;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close {
+            color: red;
+            float: left;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .submit-btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 
 <body>
-    <div class="logo">🧪 داروخانه فوق تخصصی شبانه روزی قوامین</div>
+    <div class="logo">🧪 داروخانه شبانه روزی قوامین</div>
     <h2>با ما در ارتباط باشید</h2>
     <div class="links">
         <a href="https://www.instagram.com/ghavamin.pharmacy/" target="_blank">
@@ -129,10 +225,64 @@
   <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"/>
 </svg>تماس تلفنی
         </a>
-        <h4>.ما را دنبال کنید و از جدیدترین اخبار در شبکه‌های اجتماعی مورد علاقه‌تان مطلع شوید</h4>
+        <button class="btn" id="openModal">ارسال نسخ الکترونیکی</button>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h3>ارسال نسخ الکترونیکی</h3>
+
+            <label for="rahgiri">کد رهگیری:</label>
+            <input type="text" id="rahgiri" placeholder="مثلاً 1234567890" required>
+
+            <label for="melli">کد ملی:</label>
+            <input type="text" id="melli" placeholder="مثلاً 0012345678" required>
+
+            <button class="submit-btn" onclick="sendToWhatsApp()">ارسال به واتساپ</button>
+        </div>
+
+
     </div>
 
+    <script>
+        const modal = document.getElementById("myModal");
+        const openBtn = document.getElementById("openModal");
+        const closeBtn = document.getElementById("closeModal");
+
+        openBtn.onclick = () => modal.style.display = "block";
+        closeBtn.onclick = () => modal.style.display = "none";
+        window.onclick = (e) => {
+            if (e.target === modal) modal.style.display = "none";
+        }
+
+        function sendToWhatsApp() {
+            const rahgiri = document.getElementById("rahgiri").value.trim();
+            const melli = document.getElementById("melli").value.trim();
+
+            if (!rahgiri || !melli) {
+                alert("لطفاً هر دو فیلد کد رهگیری و کد ملی را وارد کنید.");
+                return;
+            }
+
+            // 🔹 شماره واتساپ بیزینس خود را در اینجا بگذار (فرمت بین‌المللی بدون + یا 0)
+            const phoneNumber = "989121989786"; // مثال: 98912xxxxxxx
+
+            // 🔹 پیام خوش‌آمد و اطلاعات نسخه
+            const message = `
+🌿 خوش آمدید به داروخانه سلامت 🌿
+لطفاً نسخه الکترونیکی خود را ارسال کنید.
+
+📄 اطلاعات واردشده شما:
+کد رهگیری: ${rahgiri}
+کد ملی: ${melli}
+
+🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
+`;
+
+            // لینک واتساپ بیزینس
+            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
+        }
+    </script>
+
 </html>
-
-
-
