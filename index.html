@@ -240,55 +240,72 @@
 
 
     </div>
-
     <script>
         const modal = document.getElementById("myModal");
         const openBtn = document.getElementById("openModal");
         const closeBtn = document.getElementById("closeModal");
+
+        // باز کردن پاپ‌آپ
         openBtn.onclick = () => modal.style.display = "block";
+
+        // بستن با کلیک روی ×
         closeBtn.onclick = () => modal.style.display = "none";
-        window.onclick = e => {
+
+        // بستن با کلیک روی فضای بیرون پاپ‌آپ
+        window.onclick = (e) => {
             if (e.target === modal) modal.style.display = "none";
-        };
-
-        async function sendToSheetAndWhatsApp() {
-            const rahgiri = document.getElementById("rahgiri").value.trim();
-            const melli = document.getElementById("melli").value.trim();
-            if (!rahgiri || !melli) return alert("لطفاً هر دو فیلد را پر کنید.");
-
-            const scriptURL = "https://script.google.com/macros/s/AKfycbyAs10X9YO4I2blYRTXANv1DfKAB3qzW8XVMFYt4fvNr71sF_SDGUZGwgoqzjFKFK0_/exec"; // 🔹 لینک واقعی خودت را جایگزین کن
-
-            try {
-                const res = await fetch(scriptURL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        rahgiri,
-                        melli
-                    }),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                if (!res.ok) throw new Error("Sheet Error");
-
-                alert("✅ اطلاعات در Google Sheet ثبت شد.");
-                modal.style.display = "none";
-                document.getElementById("rahgiri").value = "";
-                document.getElementById("melli").value = "";
-
-                // 🔹 ارسال به واتساپ بیزینس
-                const phoneNumber = "989121989786";
-                const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}`;
-                const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-                window.open(waURL, "_blank");
-
-            } catch (err) {
-                alert("❌ خطا در ارتباط با سرور یا Google Sheet");
-                console.error(err);
-            }
         }
     </script>
-</body>
+    <script>
+        function sendToSheetAndWhatsApp() {
+            const rahgiri = document.getElementById("rahgiri").value.trim();
+            const melli = document.getElementById("melli").value.trim();
+
+            if (!rahgiri || !melli) {
+                alert("لطفاً هر دو فیلد را پر کنید.");
+                return;
+            }
+
+            const scriptURL = "https://script.google.com/macros/s/AKfycbxXgqxRBFwSnJO4iRp-EFM9z3-8olZHkPR56dDyzn3-MxEeEFwA0bOxXM9VXDUOt0gW/exec"; // جایگزین کن
+
+            // استفاده از URLSearchParams به جای JSON (بدون هدر دستی)
+            const body = new URLSearchParams({
+                rahgiri: rahgiri,
+                melli: melli
+            });
+
+            fetch(scriptURL, {
+                    method: "POST",
+                    body: body
+                        // دقت: **هیچ هدر Content-Type** دستی تنظیم نکن (مرورگر خودش application/x-www-form-urlencoded می‌گذارد)
+                })
+                .then(response => response.text())
+                .then(text => {
+                    if (text && text.indexOf("OK") !== -1) {
+                        alert("✅ اطلاعات به Google Sheet ارسال شد.");
+                        document.getElementById("rahgiri").value = "";
+                        document.getElementById("melli").value = "";
+                        // بستن پاپ‌آپ اگر لازم است:
+                        const modal = document.getElementById("myModal");
+                        if (modal) modal.style.display = "none";
+
+                        // باز کردن واتساپ
+                        const phoneNumber = "989121989786"; // شماره واتساپ بیزینس
+                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}`;
+                        const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+
+                        // باز کردن واتساپ بیزینس
+                        window.open(waURL, "_blank");
+                    } else {
+                        alert("❌ پاسخ از سرور: " + text);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("❌ خطا در ارتباط با سرور. کنسول را چک کن.");
+                });
+        }
+    </script>
+
 
 </html>
