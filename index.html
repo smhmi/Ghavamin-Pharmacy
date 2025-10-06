@@ -240,37 +240,26 @@
 
 
     </div>
+
     <script>
         const modal = document.getElementById("myModal");
         const openBtn = document.getElementById("openModal");
         const closeBtn = document.getElementById("closeModal");
-
-        // باز کردن پاپ‌آپ
         openBtn.onclick = () => modal.style.display = "block";
-
-        // بستن با کلیک روی ×
         closeBtn.onclick = () => modal.style.display = "none";
-
-        // بستن با کلیک روی فضای بیرون پاپ‌آپ
-        window.onclick = (e) => {
+        window.onclick = e => {
             if (e.target === modal) modal.style.display = "none";
-        }
-    </script>
-    <script>
-        function sendToSheetAndWhatsApp() {
+        };
+
+        async function sendToSheetAndWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
+            if (!rahgiri || !melli) return alert("لطفاً هر دو فیلد را پر کنید.");
 
-            if (!rahgiri || !melli) {
-                alert("لطفاً هر دو فیلد را پر کنید.");
-                return;
-            }
+            const scriptURL = "https://script.google.com/macros/s/AKfycbyAs10X9YO4I2blYRTXANv1DfKAB3qzW8XVMFYt4fvNr71sF_SDGUZGwgoqzjFKFK0_/exec"; // 🔹 لینک واقعی خودت را جایگزین کن
 
-            // لینک Google Apps Script
-            const scriptURL = "https://script.google.com/macros/s/AKfycbzHNv2B95C7U1UqFkM5GbGsiE3QRYb7N52DL7gIgtulZDRDbvZOsxUXFcP2PpxZOeky/exec";
-
-            // ارسال به Google Sheet
-            fetch(scriptURL, {
+            try {
+                const res = await fetch(scriptURL, {
                     method: "POST",
                     body: JSON.stringify({
                         rahgiri,
@@ -279,32 +268,27 @@
                     headers: {
                         "Content-Type": "application/json"
                     }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert("✅ اطلاعات به Google Sheet ارسال شد.");
+                });
 
-                        // پاک کردن فیلدها
-                        document.getElementById("rahgiri").value = "";
-                        document.getElementById("melli").value = "";
+                if (!res.ok) throw new Error("Sheet Error");
 
-                        // 🔹 ساخت پیام واتساپ
-                        const phoneNumber = "989121989786"; // شماره واتساپ
-                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}`;
-                        const waURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                alert("✅ اطلاعات در Google Sheet ثبت شد.");
+                modal.style.display = "none";
+                document.getElementById("rahgiri").value = "";
+                document.getElementById("melli").value = "";
 
-                        // باز کردن واتساپ در تب جدید
-                        window.open(waURL, "_blank");
+                // 🔹 ارسال به واتساپ بیزینس
+                const phoneNumber = "989121989786";
+                const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}`;
+                const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+                window.open(waURL, "_blank");
 
-                    } else {
-                        alert("❌ خطا در ارسال اطلاعات به Google Sheet.");
-                    }
-                })
-                .catch(error => alert("❌ خطا در ارتباط با سرور."));
+            } catch (err) {
+                alert("❌ خطا در ارتباط با سرور یا Google Sheet");
+                console.error(err);
+            }
         }
     </script>
+</body>
 
 </html>
-
-
-
