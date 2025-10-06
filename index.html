@@ -215,7 +215,7 @@
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/youtube.svg" alt="YouTube">یوتیوب
         </a>
         <a href="https://wa.me/982144538029" target="_blank">
-            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">واتس‌آپ
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/whatsapp.svg" alt="WhatsApp">واتساپ
         </a>
         <a href="mailto:pharmacy.ghavamin@gmail.com">
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg" alt="Email">ایمیل
@@ -232,56 +232,75 @@
             <span class="close" id="closeModal">&times;</span>
             <h3>ارسال نسخ الکترونیکی</h3>
 
-            <label for="rahgiri">کد رهگیری:</label>
-            <input type="text" id="rahgiri" placeholder="مثلاً 1234567890" required>
+            <input type="text" id="rahgiri" placeholder="کد رهگیری">
+            <input type="text" id="melli" placeholder="کد ملی">
 
-            <label for="melli">کد ملی:</label>
-            <input type="text" id="melli" placeholder="مثلاً 0012345678" required>
-
-            <button class="submit-btn" onclick="sendToWhatsApp()">ارسال به واتساپ</button>
+            <button class="submit-btn" onclick="sendToSheetAndWhatsApp()">ارسال</button>
         </div>
 
 
     </div>
-
     <script>
         const modal = document.getElementById("myModal");
         const openBtn = document.getElementById("openModal");
         const closeBtn = document.getElementById("closeModal");
 
+        // باز کردن پاپ‌آپ
         openBtn.onclick = () => modal.style.display = "block";
+
+        // بستن با کلیک روی ×
         closeBtn.onclick = () => modal.style.display = "none";
+
+        // بستن با کلیک روی فضای بیرون پاپ‌آپ
         window.onclick = (e) => {
             if (e.target === modal) modal.style.display = "none";
         }
-
-        function sendToWhatsApp() {
+    </script>
+    <script>
+        function sendToSheetAndWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
 
             if (!rahgiri || !melli) {
-                alert("لطفاً هر دو فیلد کد رهگیری و کد ملی را وارد کنید.");
+                alert("لطفاً هر دو فیلد را پر کنید.");
                 return;
             }
 
-            // 🔹 شماره واتساپ بیزینس خود را در اینجا بگذار (فرمت بین‌المللی بدون + یا 0)
-            const phoneNumber = "989121989786"; // مثال: 98912xxxxxxx
+            // لینک Google Apps Script
+            const scriptURL = "https://script.google.com/macros/s/AKfycbzFJIlXDnlfL54nr7G975eCsMG3slVU7fEYO_eCS3wp8mUY_sdvaQtbTXVwgVtSPcrf/exec";
 
-            // 🔹 پیام خوش‌آمد و اطلاعات نسخه
-            const message = `
-🌿 خوش آمدید به داروخانه سلامت 🌿
-لطفاً نسخه الکترونیکی خود را ارسال کنید.
+            // ارسال به Google Sheet
+            fetch(scriptURL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        rahgiri,
+                        melli
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("✅ اطلاعات به Google Sheet ارسال شد.");
 
-📄 اطلاعات واردشده شما:
-کد رهگیری: ${rahgiri}
-کد ملی: ${melli}
+                        // پاک کردن فیلدها
+                        document.getElementById("rahgiri").value = "";
+                        document.getElementById("melli").value = "";
 
-🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
-`;
+                        // 🔹 ساخت پیام واتساپ
+                        const phoneNumber = "989121989786"; // شماره واتساپ
+                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}`;
+                        const waURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
-            // لینک واتساپ بیزینس
-            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            window.open(url, "_blank");
+                        // باز کردن واتساپ در تب جدید
+                        window.open(waURL, "_blank");
+
+                    } else {
+                        alert("❌ خطا در ارسال اطلاعات به Google Sheet.");
+                    }
+                })
+                .catch(error => alert("❌ خطا در ارتباط با سرور."));
         }
     </script>
 
