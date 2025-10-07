@@ -12,7 +12,7 @@
             color: #333;
             text-align: center;
             position: relative;
-            
+            /* برای اینکه ::before درست عمل کنه */
             overflow: hidden;
             padding: 40px;
         }
@@ -29,7 +29,7 @@
             background-repeat: no-repeat;
             background-size: cover;
             filter: brightness(60%);
-        
+            /* 🔹 کم‌رنگ کردن بک‌گراند */
             z-index: -1;
         }
         
@@ -132,7 +132,7 @@
         .btn:hover {
             background: #005fcc;
         }
-      
+        /* پاپ‌آپ (Modal) */
         
         .modal {
             display: none;
@@ -234,6 +234,24 @@
 
             <input type="text" id="rahgiri" placeholder="کد رهگیری">
             <input type="text" id="melli" placeholder="کد ملی">
+            <input type="text" id="mobile" placeholder="موبایل">
+
+
+
+            <label for="insurance">نوع بیمه:</label>
+            <select id="insurance">
+                <option value="">انتخاب کنید</option>
+                <option value="تأمین اجتماعی">تأمین اجتماعی</option>
+                <option value="سلامت">سلامت</option>
+                <option value="نیروهای مسلح">نیروهای مسلح</option>
+            </select>
+
+
+
+
+
+
+
 
             <button class="submit-btn" onclick="sendToSheetAndWhatsApp()">ارسال</button>
         </div>
@@ -245,13 +263,13 @@
         const openBtn = document.getElementById("openModal");
         const closeBtn = document.getElementById("closeModal");
 
-        
+        // باز کردن پاپ‌آپ
         openBtn.onclick = () => modal.style.display = "block";
 
-       
+        // بستن با کلیک روی ×
         closeBtn.onclick = () => modal.style.display = "none";
 
-       
+        // بستن با کلیک روی فضای بیرون پاپ‌آپ
         window.onclick = (e) => {
             if (e.target === modal) modal.style.display = "none";
         }
@@ -260,73 +278,58 @@
         function sendToSheetAndWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            const insurance = document.getElementById("insurance").value.trim();
 
-            if (!rahgiri || !melli) {
-                alert("لطفاً هر دو فیلد را پر کنید.");
+            if (!rahgiri || !melli || !mobile || !insurance) {
+                alert("لطفاً تمام فیلدها را پر کنید.");
                 return;
             }
 
-          
-            const scriptURL = "https://script.google.com/macros/s/AKfycbxXgqxRBFwSnJO4iRp-EFM9z3-8olZHkPR56dDyzn3-MxEeEFwA0bOxXM9VXDUOt0gW/exec";
+            const scriptURL = "https://script.google.com/macros/s/AKfycbx83tHLjidNklBPEUo1p8rCZC2Omw-Tp-GGx_0kH5mh3zhZ0LOW-XQ8DxqMk8EelaVx/exec"; // جایگزین کن
 
-           
+            // استفاده از URLSearchParams به جای JSON (بدون هدر دستی)
             const body = new URLSearchParams({
                 rahgiri: rahgiri,
-                melli: melli
+                melli: melli,
+                mobile: mobile,
+                insurance: insurance
             });
 
-           
             fetch(scriptURL, {
                     method: "POST",
                     body: body
+                        // دقت: **هیچ هدر Content-Type** دستی تنظیم نکن (مرورگر خودش application/x-www-form-urlencoded می‌گذارد)
                 })
                 .then(response => response.text())
                 .then(text => {
                     if (text && text.indexOf("OK") !== -1) {
-                        console.log("Google Sheet ذخیره شد ✅");
-
-                       
+                        alert("✅ اطلاعات به Google Sheet ارسال شد.");
+                        document.getElementById("rahgiri").value = "";
+                        document.getElementById("melli").value = "";
+                        document.getElementById("mobile").value = "";
+                        document.getElementById("insurance").value = "";
+                        // بستن پاپ‌آپ اگر لازم است:
                         const modal = document.getElementById("myModal");
                         if (modal) modal.style.display = "none";
 
-                       
-                        const instance = "instance145254";
-                        const token = "trmg2iceh436gkn3"; 
-                        const url = `https://api.ultramsg.com/${instance}/messages/chat`;
+                        // باز کردن واتساپ
+                        const phoneNumber = "989222158815"; // شماره واتساپ بیزینس
+                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}\nنوع بیمه : ${insurance}`;
+                        const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
 
-                        const toNumber = "989222158815"; 
-                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}`;
-
-                        return fetch(url, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
-                            body: new URLSearchParams({
-                                token: token,
-                                to: toNumber,
-                                body: message
-                            })
-                        });
+                        // باز کردن واتساپ بیزینس
+                        window.open(waURL, "_blank");
                     } else {
-                        throw new Error("پاسخ از Google Sheet نامعتبر است");
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.sent) {
-                        alert("✅ نسخه با موفقیت ارسال شد و در واتساپ ثبت شد!");
-                    } else {
-                        alert("❌ خطا در ارسال به واتساپ");
+                        alert("❌ پاسخ از سرور: " + text);
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert("❌ خطا در ارتباط با سرور یا واتساپ");
+                    alert("❌ خطا در ارتباط با سرور. کنسول را چک کن.");
                 });
         }
     </script>
-
 
 
 </html>
