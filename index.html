@@ -258,7 +258,7 @@
         function sendToWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
-           const mobile = document.getElementById("mobile").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
             const insurance = document.getElementById("insurance").value.trim();
             
              if (!rahgiri || !melli || !mobile || !insurance) {
@@ -286,17 +286,8 @@
             const phoneNumber = "989201074887"; // مثال: 98912xxxxxxx
 
             // 🔹 پیام خوش‌آمد و اطلاعات نسخه
-            const message = `
-                🌿 داروخانه شبانه روزی قوامین 🌿
-                
-                📄 اطلاعات واردشده شما:
-                کد رهگیری: ${rahgiri}
-                کد ملی: ${melli}
-               نوع بیمه: ${insurance}
-               شماره موبایل: ${mobile}
-                
-                🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
-                `;
+            const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}\nنوع بیمه : ${insurance}\nشماره موبایل: ${mobile}`;
+
 
             // لینک واتساپ بیزینس
             const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
@@ -307,6 +298,7 @@
 
 
 </html>
+
 
 
 
