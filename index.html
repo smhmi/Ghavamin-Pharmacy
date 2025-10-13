@@ -240,7 +240,7 @@
                 <option value="سلامت">سلامت</option>
                 <option value="نیروهای مسلح">نیروهای مسلح</option>
             </select>
-            <button class="submit-btn" onclick="sendToSheetAndWhatsApp()">ارسال</button>
+            <button class="submit-btn" onclick="sendToWhatsApp()">ارسال</button>
         </div>
     </div>
 
@@ -249,25 +249,19 @@
         const openBtn = document.getElementById("openModal");
         const closeBtn = document.getElementById("closeModal");
 
-        // باز کردن پاپ‌آپ
         openBtn.onclick = () => modal.style.display = "block";
-
-        // بستن با کلیک روی ×
         closeBtn.onclick = () => modal.style.display = "none";
-
-        // بستن با کلیک روی فضای بیرون پاپ‌آپ
         window.onclick = (e) => {
             if (e.target === modal) modal.style.display = "none";
         }
-    </script>
-    <script>
-        function sendToSheetAndWhatsApp() {
+
+        function sendToWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
-            const mobile = document.getElementById("mobile").value.trim();
+           const mobile = document.getElementById("mobile").value.trim();
             const insurance = document.getElementById("insurance").value.trim();
-
-            if (!rahgiri || !melli || !mobile || !insurance) {
+            
+             if (!rahgiri || !melli || !mobile || !insurance) {
                 alert("لطفاً تمام فیلدها را پر کنید.");
                 return;
             }
@@ -288,62 +282,32 @@
                 return;
             }
 
-            const scriptURL = "https://script.google.com/macros/s/AKfycbx83tHLjidNklBPEUo1p8rCZC2Omw-Tp-GGx_0kH5mh3zhZ0LOW-XQ8DxqMk8EelaVx/exec"; // جایگزین کن
+            // 🔹 شماره واتساپ بیزینس خود را در اینجا بگذار (فرمت بین‌المللی بدون + یا 0)
+            const phoneNumber = "989201074887"; // مثال: 98912xxxxxxx
 
-            const body = new URLSearchParams({
-                rahgiri: rahgiri,
-                melli: melli,
-                mobile: mobile,
-                insurance: insurance
-            });
+            // 🔹 پیام خوش‌آمد و اطلاعات نسخه
+            const message = `
+                🌿 داروخانه شبانه روزی قوامین 🌿
+                
+                📄 اطلاعات واردشده شما:
+                کد رهگیری: ${rahgiri}
+                کد ملی: ${melli}
+               نوع بیمه: ${insurance}
+               شماره موبایل: ${mobile}
+                
+                🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
+                `;
 
-            fetch(scriptURL, {
-                    method: "POST",
-                    body: body
-                })
-                .then(response => response.text())
-                .then(text => {
-                    if (text && text.indexOf("OK") !== -1) {
-                        alert("✅ اطلاعات به واتساپ ارسال شد.");
-                        document.getElementById("rahgiri").value = "";
-                        document.getElementById("melli").value = "";
-                        document.getElementById("mobile").value = "";
-                        document.getElementById("insurance").value = "";
-                        const modal = document.getElementById("myModal");
-                        if (modal) modal.style.display = "none";
-
-                        const instance = "instance145254"; 
-                        const token = "trmg2iceh436gkn3"; 
-                        const url = `https://api.ultramsg.com/${instance}/messages/chat`;
-
-                        const toNumber = "989201074887"; // شماره واتساپ بیزینس
-                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}\nنوع بیمه : ${insurance}\nشماره موبایل: ${mobile}`;
-
-                        return fetch(url, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
-                            body: new URLSearchParams({
-                                token: token,
-                                to: toNumber,
-                                body: message
-                            })
-                        });
-                    } else {
-                        alert("❌ پاسخ از سرور: " + text);
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("❌ خطا در ارتباط با سرور. کنسول را چک کن.");
-                });
+            // لینک واتساپ بیزینس
+            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
         }
     </script>
 
 
 
 </html>
+
 
 
 
