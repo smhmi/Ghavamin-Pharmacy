@@ -240,74 +240,82 @@
                 <option value="سلامت">سلامت</option>
                 <option value="نیروهای مسلح">نیروهای مسلح</option>
             </select>
-            <button class="submit-btn" onclick="sendToWhatsApp()">ارسال</button>
+            <button class="submit-btn" onclick="sendToSheetAndWhatsApp()">ارسال</button>
         </div>
     </div>
 
- <script>
+<script>
         const modal = document.getElementById("myModal");
         const openBtn = document.getElementById("openModal");
         const closeBtn = document.getElementById("closeModal");
 
+        // باز کردن پاپ‌آپ
         openBtn.onclick = () => modal.style.display = "block";
+
+        // بستن با کلیک روی ×
         closeBtn.onclick = () => modal.style.display = "none";
+
+        // بستن با کلیک روی فضای بیرون پاپ‌آپ
         window.onclick = (e) => {
             if (e.target === modal) modal.style.display = "none";
         }
-
-        function sendToWhatsApp() {
+    </script>
+    <script>
+        function sendToSheetAndWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
-            const mobile = document.getElementById("mobile").value.trim();
-            const insurance = document.getElementById("insurance").value.trim();
 
-            if (!rahgiri || !melli|| !mobile || !insurance) {
-                alert("لطفاً تمام فیلدها را پر کنید..");
+            if (!rahgiri || !melli) {
+                alert("لطفاً هر دو فیلد را پر کنید.");
                 return;
             }
 
-           const rahgiriRegex = /^[0-9]{3,5}$/;
-            if (!rahgiriRegex.test(rahgiri)) {
-                alert("❌ کد رهگیری باید فقط عددی و بین ۳ تا ۵ رقم باشد.");
-                return;
-            }
+            const scriptURL = "https://script.google.com/macros/s/AKfycbxXgqxRBFwSnJO4iRp-EFM9z3-8olZHkPR56dDyzn3-MxEeEFwA0bOxXM9VXDUOt0gW/exec"; // جایگزین کن
 
-            const melliRegex = /^[0-9]{10}$/;
-            if (!melliRegex.test(melli)) {
-                alert("❌ کد ملی باید دقیقاً ۱۰ رقم عددی باشد.");
-                return;
-            }
-            const mobileRegex = /^[0-9]{11}$/;
-            if (!mobileRegex.test(mobile)) {
-                alert("❌ شماره موبایل باید دقیقاً ۱۱ رقم عددی باشد.");
-                return;
-            }
+            // استفاده از URLSearchParams به جای JSON (بدون هدر دستی)
+            const body = new URLSearchParams({
+                rahgiri: rahgiri,
+                melli: melli
+            });
 
-            // 🔹 شماره واتساپ بیزینس خود را در اینجا بگذار (فرمت بین‌المللی بدون + یا 0)
-            const phoneNumber = "989201074887"; 
+            fetch(scriptURL, {
+                    method: "POST",
+                    body: body
+                        // دقت: **هیچ هدر Content-Type** دستی تنظیم نکن (مرورگر خودش application/x-www-form-urlencoded می‌گذارد)
+                })
+                .then(response => response.text())
+                .then(text => {
+                    if (text && text.indexOf("OK") !== -1) {
+                        alert("✅ اطلاعات به واتساپ ارسال شد.");
+                        document.getElementById("rahgiri").value = "";
+                        document.getElementById("melli").value = "";
+                        // بستن پاپ‌آپ اگر لازم است:
+                        const modal = document.getElementById("myModal");
+                        if (modal) modal.style.display = "none";
 
-            // 🔹 پیام خوش‌آمد و اطلاعات نسخه
-            const message = `
-🌿 خوش آمدید به داروخانه سلامت 🌿
-لطفاً نسخه الکترونیکی خود را ارسال کنید.
+                        // باز کردن واتساپ
+                        const phoneNumber = "989201074887"; // شماره واتساپ بیزینس
+                        const message = `🌿 خوش آمدید به داروخانه قوامین 🌿
+لطفاً نسخه الکترونیکی خود را ارسال کنید.🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}\nنوع بیمه: ${insurance}\nشماره موبایل: ${mobile}`;
+                        const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
 
-📄 اطلاعات واردشده شما:
-کد رهگیری: ${rahgiri}
-کد ملی: ${melli}
-نوع بیمه: ${insurance}
-شماره موبایل: ${mobile}
-🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
-`;
-
-            // لینک واتساپ بیزینس
-            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            window.open(url, "_blank");
+                        // باز کردن واتساپ بیزینس
+                        window.open(waURL, "_blank");
+                    } else {
+                        alert("❌ پاسخ از سرور: " + text);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("❌ خطا در ارتباط با سرور. کنسول را چک کن.");
+                });
         }
     </script>
 
 
 
 </html>
+
 
 
 
