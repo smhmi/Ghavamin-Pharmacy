@@ -271,19 +271,35 @@
                 alert("لطفاً تمام فیلدها را پر کنید.");
                 return;
             }
+            const rahgiriRegex = /^[0-9]{3,5}$/;
+            if (!rahgiriRegex.test(rahgiri)) {
+                alert("❌ کد رهگیری باید فقط عددی و بین ۳ تا ۵ رقم باشد.");
+                return;
+            }
 
-            const scriptURL = "https://script.google.com/macros/s/AKfycbxXgqxRBFwSnJO4iRp-EFM9z3-8olZHkPR56dDyzn3-MxEeEFwA0bOxXM9VXDUOt0gW/exec"; // جایگزین کن
+            const melliRegex = /^[0-9]{10}$/;
+            if (!melliRegex.test(melli)) {
+                alert("❌ کد ملی باید دقیقاً ۱۰ رقم عددی باشد.");
+                return;
+            }
+            const mobileRegex = /^[0-9]{11}$/;
+            if (!mobileRegex.test(mobile)) {
+                alert("❌ شماره موبایل باید دقیقاً ۱۱ رقم عددی باشد.");
+                return;
+            }
 
-            // استفاده از URLSearchParams به جای JSON (بدون هدر دستی)
+            const scriptURL = "https://script.google.com/macros/s/AKfycbx83tHLjidNklBPEUo1p8rCZC2Omw-Tp-GGx_0kH5mh3zhZ0LOW-XQ8DxqMk8EelaVx/exec"; // جایگزین کن
+
             const body = new URLSearchParams({
                 rahgiri: rahgiri,
-                melli: melli
+                melli: melli,
+                mobile: mobile,
+                insurance: insurance
             });
 
             fetch(scriptURL, {
                     method: "POST",
                     body: body
-                        // دقت: **هیچ هدر Content-Type** دستی تنظیم نکن (مرورگر خودش application/x-www-form-urlencoded می‌گذارد)
                 })
                 .then(response => response.text())
                 .then(text => {
@@ -293,24 +309,27 @@
                         document.getElementById("melli").value = "";
                         document.getElementById("mobile").value = "";
                         document.getElementById("insurance").value = "";
-                        // بستن پاپ‌آپ اگر لازم است:
                         const modal = document.getElementById("myModal");
                         if (modal) modal.style.display = "none";
 
-                        // باز کردن واتساپ
-                        const phoneNumber = "989201074887"; // شماره واتساپ بیزینس
-                        const message = `
-                            🌿 خوش آمدید به داروخانه شبانه روزی قوامین 🌿
-                            
-                            📄 اطلاعات واردشده شما:
-                            کد رهگیری: ${rahgiri}
-                            کد ملی: ${melli}
-                            نوع بیمه: ${insurance}
-                            شماره موبایل: ${mobile}
-                            🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
-                            `;
-                        // باز کردن واتساپ بیزینس
-                        window.open(waURL, "_blank");
+                        const instance = "instance145254"; 
+                        const token = "trmg2iceh436gkn3"; 
+                        const url = `https://api.ultramsg.com/${instance}/messages/chat`;
+
+                        const toNumber = "989201074887"; // شماره واتساپ بیزینس
+                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}\nنوع بیمه : ${insurance}\nشماره موبایل: ${mobile}`;
+
+                        return fetch(url, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: new URLSearchParams({
+                                token: token,
+                                to: toNumber,
+                                body: message
+                            })
+                        });
                     } else {
                         alert("❌ پاسخ از سرور: " + text);
                     }
@@ -325,6 +344,7 @@
 
 
 </html>
+
 
 
 
