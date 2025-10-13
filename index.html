@@ -264,9 +264,11 @@
         function sendToSheetAndWhatsApp() {
             const rahgiri = document.getElementById("rahgiri").value.trim();
             const melli = document.getElementById("melli").value.trim();
+            const mobile = document.getElementById("mobile").value.trim();
+            const insurance = document.getElementById("insurance").value.trim();
 
-            if (!rahgiri || !melli) {
-                alert("لطفاً هر دو فیلد را پر کنید.");
+            if (!rahgiri || !melli || !mobile || !insurance) {
+                alert("لطفاً تمام فیلدها را پر کنید.");
                 return;
             }
 
@@ -289,15 +291,24 @@
                         alert("✅ اطلاعات به واتساپ ارسال شد.");
                         document.getElementById("rahgiri").value = "";
                         document.getElementById("melli").value = "";
+                        document.getElementById("mobile").value = "";
+                        document.getElementById("insurance").value = "";
                         // بستن پاپ‌آپ اگر لازم است:
                         const modal = document.getElementById("myModal");
                         if (modal) modal.style.display = "none";
 
                         // باز کردن واتساپ
                         const phoneNumber = "989201074887"; // شماره واتساپ بیزینس
-                        const message = `🩺 ارسال نسخه الکترونیکی:\nکد رهگیری: ${rahgiri}\nکد ملی: ${melli}\nنوع بیمه : ${insurance}\nشماره موبایل: ${mobile}`;
-                        const waURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-
+                        const message = `
+                            🌿 خوش آمدید به داروخانه شبانه روزی قوامین 🌿
+                            
+                            📄 اطلاعات واردشده شما:
+                            کد رهگیری: ${rahgiri}
+                            کد ملی: ${melli}
+                            نوع بیمه: ${insurance}
+                            شماره موبایل: ${mobile}
+                            🕓 پشتیبانی ما به زودی پاسخ‌گو خواهد بود.
+                            `;
                         // باز کردن واتساپ بیزینس
                         window.open(waURL, "_blank");
                     } else {
@@ -314,6 +325,7 @@
 
 
 </html>
+
 
 
 
